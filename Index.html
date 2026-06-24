@@ -1,0 +1,961 @@
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover"/>
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Sapito 3.0">
+  <meta name="theme-color" content="#0a0f1e">
+  <title>Control Sapito 3.0 – Algarrobo</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --azul-900: #1e293b;
+      --azul-800: #1e40af;
+      --azul-700: #1d4ed8;
+      --azul-600: #2563eb;
+      --azul-500: #2563eb;
+      --azul-400: #3b82f6;
+      --azul-300: #93c5fd;
+      --azul-100: #dbeafe;
+      --azul-50:  #eff6ff;
+      --cian:       #2563eb;
+      --blanco:   #ffffff;
+      --gris-900: #111827;
+      --gris-700: #374151;
+      --gris-500: #6b7280;
+      --gris-200: #e5e7eb;
+      --gris-100: #f3f4f6;
+      --gris-50:  #f9fafb;
+      --fondo:    #f0f2f5;
+      --verde:      #16a34a;
+      --verde-bg:   #dcfce7;
+      --amarillo:   #d97706;
+      --amarillo-bg:#fef3c7;
+      --rojo:       #dc2626;
+      --rojo-bg:    #fee2e2;
+      --font: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      --radio: 14px;
+      --sombra: 0 4px 24px rgba(0,0,0,0.18);
+      --sombra-lg: 0 8px 40px rgba(0,0,0,0.28);
+    }
+
+    html { height: 100%; -webkit-text-size-adjust: 100%; }
+    body {
+      font-family: var(--font);
+      background: var(--fondo);
+      min-height: 100vh;
+      color: var(--gris-900);
+      display: flex; flex-direction: column;
+      padding-top: env(safe-area-inset-top);
+      padding-bottom: env(safe-area-inset-bottom);
+    }
+
+    /* ── HEADER ── */
+    .header {
+      background: var(--blanco);
+      box-shadow: 0 1px 8px rgba(0,0,0,0.07);
+      position: sticky; top: 0; z-index: 50;
+      border-bottom: 1px solid var(--gris-200);
+    }
+    .header-inner {
+      max-width: 680px; margin: 0 auto;
+      padding: 14px 20px;
+      display: flex; align-items: center; gap: 14px;
+    }
+    .logo-wrap {
+      flex-shrink: 0;
+      background: var(--gris-50);
+      border: 1px solid var(--gris-200);
+      border-radius: 10px; padding: 7px 11px;
+    }
+    .logo { height: 36px; width: auto; object-fit: contain; display: block; }
+    .header-text { flex: 1; min-width: 0; }
+    .header-eyebrow {
+      font-size: 9px; font-weight: 700; letter-spacing: 2.5px;
+      text-transform: uppercase; color: var(--azul-500); margin-bottom: 2px;
+    }
+    .header-title {
+      font-size: 20px; font-weight: 900; color: var(--gris-900);
+      letter-spacing: -0.5px; line-height: 1;
+    }
+    .header-title .ver { color: var(--cian); font-size: 22px; }
+    .header-loc { font-size: 11px; color: var(--gris-500); margin-top: 3px; font-weight: 500; }
+
+    /* ── MAIN ── */
+    .main {
+      flex: 1; max-width: 680px; width: 100%;
+      margin: 0 auto; padding: 20px 16px 40px;
+      display: flex; flex-direction: column; gap: 14px;
+    }
+
+    /* ── SEARCH CARD ── */
+    .search-card {
+      background: var(--blanco);
+      border-radius: var(--radio);
+      padding: 20px;
+      box-shadow: var(--sombra);
+      border: 1px solid var(--gris-200);
+    }
+    .search-eyebrow {
+      font-size: 10px; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 1.5px; color: var(--azul-500); margin-bottom: 12px;
+      display: flex; align-items: center; gap: 6px;
+    }
+    .search-eyebrow::before {
+      content: ''; display: block; width: 3px; height: 14px;
+      background: var(--azul-500); border-radius: 2px;
+    }
+    .search-row { display: flex; gap: 8px; align-items: stretch; flex-wrap: wrap; }
+    .input-wrap { flex: 1 1 200px; position: relative; order: 1; }
+    .input-icon {
+      position: absolute; left: 13px; top: 50%;
+      transform: translateY(-50%); font-size: 15px; pointer-events: none; z-index: 1;
+    }
+    .search-input {
+      width: 100%; padding: 13px 13px 13px 40px;
+      border: 2px solid var(--gris-200); border-radius: 11px;
+      font-size: 16px; font-family: var(--font); color: var(--gris-900);
+      background: var(--gris-50); outline: none;
+      -webkit-appearance: none;
+      transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
+    }
+    .search-input:focus {
+      border-color: var(--azul-400); background: var(--blanco);
+      box-shadow: 0 0 0 4px rgba(59,130,246,0.1);
+    }
+    .search-input::placeholder { color: #9ca3af; }
+
+    /* ── DROPDOWN — scroll táctil real ── */
+    .suggestions {
+      position: absolute; top: calc(100% + 6px); left: 0; right: 0;
+      background: var(--blanco);
+      border: 1.5px solid var(--azul-400);
+      border-radius: 11px;
+      box-shadow: var(--sombra-lg);
+      z-index: 200;
+      /* scroll táctil */
+      max-height: 280px;
+      overflow-y: scroll;           /* scroll siempre activo */
+      -webkit-overflow-scrolling: touch;
+      overscroll-behavior: contain;
+      touch-action: pan-y;          /* permite deslizar verticalmente */
+    }
+    .suggestions.hidden { display: none; }
+
+    .sugg-header-sticky {
+      position: sticky; top: 0;
+      padding: 7px 14px;
+      font-size: 10px; font-weight: 700;
+      letter-spacing: 1px; text-transform: uppercase;
+      color: var(--gris-500);
+      background: var(--gris-50);
+      border-bottom: 1px solid var(--gris-200);
+      z-index: 1;
+    }
+    .suggestion-item {
+      padding: 12px 14px; cursor: pointer;
+      border-bottom: 1px solid var(--gris-100);
+      min-height: 52px;
+      display: flex; flex-direction: column; justify-content: center;
+      -webkit-tap-highlight-color: transparent;
+      user-select: none;
+      /* sin transition para no bloquear el scroll */
+    }
+    .suggestion-item:last-child { border-bottom: none; }
+    .suggestion-item.active,
+    .suggestion-item:hover { background: var(--azul-50); }
+    .sugg-label { font-size: 10px; color: var(--gris-500); font-family: monospace; }
+    .sugg-desc  { font-size: 13px; font-weight: 600; color: var(--gris-900); margin-top: 2px; line-height: 1.3; }
+
+    /* ── BOTONES ── */
+    .btn-cam {
+      order: 2; flex-shrink: 0;
+      width: 48px; height: 48px;
+      background: var(--gris-100); border: 2px solid var(--gris-200);
+      border-radius: 11px; font-size: 20px; cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      -webkit-tap-highlight-color: transparent; transition: all 0.15s;
+    }
+    .btn-cam:active { background: var(--azul-100); border-color: var(--azul-400); transform: scale(0.95); }
+
+    .btn-consultar {
+      order: 3; flex: 1 1 80px;
+      padding: 13px 20px;
+      background: linear-gradient(135deg, var(--azul-600), var(--azul-500));
+      color: var(--blanco); border: none; border-radius: 11px;
+      font-size: 15px; font-weight: 700; cursor: pointer;
+      box-shadow: 0 4px 14px rgba(29,78,216,0.35);
+      -webkit-tap-highlight-color: transparent; transition: all 0.15s;
+      min-height: 48px; white-space: nowrap;
+    }
+    .btn-consultar:active { transform: scale(0.97); opacity: 0.9; }
+    .btn-consultar:disabled { opacity: 0.5; cursor: not-allowed; }
+
+    /* ── RESULTADO ── */
+    .resultado {
+      background: var(--blanco); border-radius: var(--radio);
+      overflow: hidden; box-shadow: var(--sombra);
+      border: 1px solid var(--gris-200);
+      animation: slideIn 0.25s ease;
+    }
+    .resultado.hidden { display: none; }
+    @keyframes slideIn {
+      from { opacity: 0; transform: translateY(-8px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    .res-header {
+      background: linear-gradient(135deg, var(--azul-900), var(--azul-600));
+      padding: 16px 20px; display: flex; align-items: center; gap: 12px;
+      border-bottom: 1px solid rgba(59,130,246,0.2);
+    }
+    .res-icon {
+      width: 38px; height: 38px; border-radius: 10px;
+      background: rgba(255,255,255,0.1);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 18px; flex-shrink: 0;
+    }
+    .res-found-label {
+      font-size: 9px; font-weight: 700; letter-spacing: 2px;
+      text-transform: uppercase; color: var(--azul-300);
+    }
+    .res-sku {
+      font-size: 17px; font-weight: 900; color: var(--blanco);
+      font-family: monospace; letter-spacing: 0.5px;
+    }
+    .res-body { padding: 18px; }
+    .res-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .res-field {
+      background: var(--gris-50); border: 1.5px solid var(--gris-200);
+      border-radius: 11px; padding: 14px;
+    }
+    .res-field.span2 { grid-column: 1 / -1; }
+    .res-field.desc-field { background: var(--fondo); border-color: var(--azul-100); }
+    .res-field-label {
+      font-size: 9px; font-weight: 700; letter-spacing: 1.5px;
+      text-transform: uppercase; color: var(--gris-500); margin-bottom: 6px;
+    }
+    .res-field.desc-field .res-field-label { color: var(--azul-500); }
+    .res-field-value { font-size: 14px; font-weight: 600; color: var(--gris-900); line-height: 1.4; }
+    .stock-num {
+      font-size: 52px; font-weight: 900; line-height: 1;
+      letter-spacing: -2px; color: var(--gris-900);
+    }
+    .stock-unit {
+      font-size: 12px; font-weight: 600; color: var(--gris-500);
+      margin-top: 3px; text-transform: uppercase; letter-spacing: 1px;
+    }
+    .stock-badge {
+      display: inline-flex; align-items: center; gap: 5px;
+      padding: 5px 12px; border-radius: 20px;
+      font-size: 12px; font-weight: 700; margin-top: 10px;
+    }
+    .stock-badge::before { content: '●'; font-size: 8px; }
+    .badge-ok   { background: var(--verde-bg);    color: var(--verde); }
+    .badge-low  { background: var(--amarillo-bg); color: var(--amarillo); }
+    .badge-zero { background: var(--rojo-bg);     color: var(--rojo); }
+
+    .res-error { padding: 22px; display: flex; align-items: center; gap: 14px; }
+    .error-icon { font-size: 28px; flex-shrink: 0; }
+    .error-title { font-size: 15px; font-weight: 700; color: var(--rojo); }
+    .error-msg   { font-size: 13px; color: var(--gris-500); margin-top: 3px; }
+
+    .loading { padding: 40px; text-align: center; }
+    .spinner {
+      width: 32px; height: 32px; margin: 0 auto 12px;
+      border: 3px solid var(--azul-100); border-top-color: var(--azul-500);
+      border-radius: 50%; animation: spin 0.7s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .loading p { font-size: 14px; color: var(--gris-500); }
+
+    .empty-state { text-align: center; padding: 52px 20px; color: var(--gris-500); }
+    .empty-icon { font-size: 52px; margin-bottom: 14px; opacity: 0.6; }
+    .empty-text { font-size: 15px; line-height: 1.5; max-width: 260px; margin: 0 auto; }
+
+    .footer {
+      text-align: center; padding: 16px;
+      font-size: 11px; color: var(--gris-500);
+      border-top: 1px solid var(--gris-200);
+      background: var(--blanco);
+      padding-bottom: calc(16px + env(safe-area-inset-bottom));
+    }
+
+    /* ══ SCANNER ══ */
+    .scanner-overlay {
+      position: fixed; inset: 0; background: #000;
+      z-index: 999; display: flex; flex-direction: column;
+    }
+    .scanner-overlay.hidden { display: none; }
+    .scanner-header {
+      background: linear-gradient(135deg, #0f172a, #1e293b);
+      padding: 14px 20px;
+      padding-top: calc(14px + env(safe-area-inset-top));
+      display: flex; align-items: center; justify-content: space-between;
+      flex-shrink: 0; border-bottom: 1px solid rgba(59,130,246,0.2);
+    }
+    .scanner-title { font-size: 15px; font-weight: 800; color: var(--blanco); }
+    .scanner-sub   { font-size: 11px; color: var(--gris-500); margin-top: 2px; }
+    .btn-cerrar-scan {
+      background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2);
+      color: var(--blanco); font-size: 13px; font-weight: 700;
+      padding: 7px 16px; border-radius: 20px; cursor: pointer;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .scanner-viewport { position: relative; flex: 1; overflow: hidden; background: #000; }
+    #reader { width: 100% !important; height: 100% !important; border: none !important; }
+    #reader__dashboard_section_swaplink,
+    #reader__dashboard_section_fileselection,
+    #reader__filescan_input,
+    #reader__scan_region img { display: none !important; }
+    #reader__scan_region { border: none !important; background: transparent !important; }
+    .scan-ui { position: absolute; inset: 0; pointer-events: none; z-index: 5; }
+    .s-dark-top    { position: absolute; top: 0; left: 0; right: 0; height: 22%; background: rgba(0,0,0,0.6); }
+    .s-dark-bottom { position: absolute; bottom: 0; left: 0; right: 0; height: 28%; background: rgba(0,0,0,0.6); }
+    .s-dark-left   { position: absolute; top: 22%; bottom: 28%; left: 0; width: 7%; background: rgba(0,0,0,0.6); }
+    .s-dark-right  { position: absolute; top: 22%; bottom: 28%; right: 0; width: 7%; background: rgba(0,0,0,0.6); }
+    .s-window      { position: absolute; top: 22%; bottom: 28%; left: 7%; right: 7%; }
+    .s-corner { position: absolute; width: 24px; height: 24px; border-color: var(--cian); border-style: solid; }
+    .s-corner.tl { top: 0; left: 0; border-width: 3px 0 0 3px; border-radius: 5px 0 0 0; }
+    .s-corner.tr { top: 0; right: 0; border-width: 3px 3px 0 0; border-radius: 0 5px 0 0; }
+    .s-corner.bl { bottom: 0; left: 0; border-width: 0 0 3px 3px; border-radius: 0 0 0 5px; }
+    .s-corner.br { bottom: 0; right: 0; border-width: 0 3px 3px 0; border-radius: 0 0 5px 0; }
+    .s-line {
+      position: absolute; left: 4px; right: 4px; height: 2px;
+      background: linear-gradient(90deg, transparent, var(--cian), transparent);
+      box-shadow: 0 0 12px var(--cian);
+      animation: scanMove 2s ease-in-out infinite;
+    }
+    @keyframes scanMove {
+      0%   { top: 6px; opacity: 0; }
+      10%  { opacity: 1; }
+      90%  { opacity: 1; }
+      100% { top: calc(100% - 6px); opacity: 0; }
+    }
+    .s-hint {
+      position: absolute; bottom: 29%; left: 0; right: 0;
+      text-align: center; font-size: 13px;
+      color: rgba(255,255,255,0.7); padding: 0 20px;
+      text-shadow: 0 1px 6px rgba(0,0,0,0.9);
+    }
+    .scanner-status {
+      background: #0f172a; padding: 13px 20px;
+      display: flex; align-items: center; justify-content: center; gap: 10px;
+      flex-shrink: 0; min-height: 58px;
+      border-top: 1px solid rgba(59,130,246,0.15);
+    }
+    .scanner-status.success { background: linear-gradient(135deg, #064e3b, var(--verde)); }
+    .scan-status-text { font-size: 14px; color: rgba(255,255,255,0.75); }
+    .scan-status-text strong { color: var(--blanco); display: block; font-size: 15px; }
+    .scanner-manual {
+      background: #0d1117; padding: 10px 14px;
+      padding-bottom: calc(10px + env(safe-area-inset-bottom));
+      display: flex; gap: 8px; flex-shrink: 0;
+      border-top: 1px solid #1e2d3d;
+    }
+    .scan-manual-input {
+      flex: 1; padding: 11px 14px;
+      background: #161b22; border: 1.5px solid #30363d;
+      border-radius: 9px; color: var(--blanco); font-size: 16px;
+      font-family: monospace; outline: none; -webkit-appearance: none;
+    }
+    .scan-manual-input:focus { border-color: var(--cian); }
+    .scan-manual-input::placeholder { color: #484f58; }
+    .btn-scan-ok {
+      padding: 11px 16px; background: var(--azul-500);
+      color: var(--blanco); border: none; border-radius: 9px;
+      font-size: 14px; font-weight: 700; cursor: pointer;
+      white-space: nowrap; -webkit-tap-highlight-color: transparent;
+    }
+    .btn-scan-ok:active { opacity: 0.85; }
+
+    /* ── Responsive ── */
+    @media (max-width: 480px) {
+      .header-title { font-size: 18px; }
+      .header-title .ver { font-size: 20px; }
+      .main { padding: 14px 12px 32px; gap: 12px; }
+      .search-card { padding: 16px; }
+      .input-wrap { flex: 1 1 100%; order: 1; }
+      .btn-cam { order: 2; }
+      .btn-consultar { order: 3; flex: 1; }
+      .res-grid { grid-template-columns: 1fr; }
+      .res-field.span2 { grid-column: 1; }
+      .stock-num { font-size: 44px; }
+      .suggestions { max-height: 220px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- HEADER: sin pill de caché, limpio -->
+  <header class="header">
+    <div class="header-inner">
+      <div class="logo-wrap">
+        <img
+          src="https://www.casaideas.com.bo/static/media/logo.40b7cd09.png"
+          alt="Casaideas" class="logo"
+          onerror="this.style.display='none'"
+        />
+      </div>
+      <div class="header-text">
+        <div class="header-eyebrow">Sistema de Inventario</div>
+        <div class="header-title">Control Sapito <span class="ver">3.0</span></div>
+        <div class="header-loc">📍 Algarrobo</div>
+      </div>
+    </div>
+  </header>
+
+  <!-- MAIN -->
+  <main class="main">
+    <div class="search-card">
+      <div class="search-eyebrow">Consultar stock</div>
+      <div class="search-row">
+        <div class="input-wrap">
+          <span class="input-icon">🔍</span>
+          <input
+            type="text" id="skuInput"
+            placeholder="SKU, código madre o descripción…"
+            autocomplete="off" class="search-input"
+          />
+          <div id="suggestions" class="suggestions hidden"></div>
+        </div>
+        <button class="btn-cam" onclick="abrirScanner()" title="Escanear código">📷</button>
+        <button class="btn-consultar" onclick="buscar()">Consultar</button>
+      </div>
+    </div>
+
+    <section id="resultado" class="resultado hidden"></section>
+
+    <div id="estadoVacio" class="empty-state">
+      <div class="empty-icon">📦</div>
+      <p class="empty-text">Ingresa un SKU, código madre o descripción para consultar el stock en bodega.</p>
+    </div>
+  </main>
+
+  <footer class="footer">
+    Control Sapito 3.0 &nbsp;·&nbsp; CasaIdeas Algarrobo
+  </footer>
+
+  <!-- SCANNER -->
+  <div id="scannerOverlay" class="scanner-overlay hidden">
+    <div class="scanner-header">
+      <div>
+        <div class="scanner-title">📷 Escáner de código de barras</div>
+        <div class="scanner-sub">Control Sapito 3.0 · Algarrobo</div>
+      </div>
+      <button class="btn-cerrar-scan" onclick="cerrarScanner()">✕ Cerrar</button>
+    </div>
+    <div class="scanner-viewport">
+      <div id="reader"></div>
+      <div class="scan-ui">
+        <div class="s-dark-top"></div>
+        <div class="s-dark-bottom"></div>
+        <div class="s-dark-left"></div>
+        <div class="s-dark-right"></div>
+        <div class="s-window">
+          <span class="s-corner tl"></span>
+          <span class="s-corner tr"></span>
+          <span class="s-corner bl"></span>
+          <span class="s-corner br"></span>
+          <div class="s-line"></div>
+        </div>
+        <div class="s-hint">Centra el código de barras dentro del recuadro</div>
+      </div>
+    </div>
+    <div class="scanner-status" id="scannerStatus">
+      <span>🔍</span>
+      <span class="scan-status-text" id="scannerStatusText">Buscando código de barras…</span>
+    </div>
+    <div class="scanner-manual">
+      <input type="number" inputmode="numeric" class="scan-manual-input"
+        id="scannerManualInput" placeholder="O escribe el SKU manualmente…"/>
+      <button class="btn-scan-ok" onclick="confirmarManualScanner()">✓ OK</button>
+    </div>
+  </div>
+
+  <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+  <script>
+  'use strict';
+
+  // ═══════════════════════════════════════════════
+  //  CONFIG
+  // ═══════════════════════════════════════════════
+  const API = 'https://script.google.com/macros/s/AKfycbxHTWp9tI89AHB_SfdTAHTmYk2m_iuIDZczOuJhyutcIX2Ex1m4hZ9ChDdii-tP8cC22A/exec;'
+
+  // ═══════════════════════════════════════════════
+  //  CACHÉ LOCAL — invisible para el usuario
+  //  Se carga en segundo plano al arrancar.
+  //  Mientras no está lista, cae al backend.
+  // ═══════════════════════════════════════════════
+  const Cache = {
+    listo: false,
+    items: [],      // [{ sku, desc, cod }]  — toda la Base de Datos
+    skuSet: new Set() // para lookup rápido en buscar()
+  };
+
+  function cargarCache() {
+    // Carga silenciosa en segundo plano
+    jsonp(API + '?action=prefetch', datos => {
+      if (!datos || !Array.isArray(datos) || datos.length === 0) return;
+      Cache.items = datos;
+      Cache.skuSet.clear();
+      for (const d of datos) {
+        if (d.sku) Cache.skuSet.add(d.sku.toString().trim());
+      }
+      Cache.listo = true;
+    });
+  }
+
+  // ── Búsqueda por prefijo de SKU ──
+  function cacheSugerirSku(prefijo) {
+    const pre = prefijo.trim();
+    const res = [];
+    const seen = new Set();
+    for (const it of Cache.items) {
+      const s = it.sku || '';
+      if (s.startsWith(pre) && !seen.has(s)) {
+        seen.add(s);
+        res.push({ sku: s, desc: it.desc || '' });
+        if (res.length >= 8) break;
+      }
+    }
+    return res;
+  }
+
+  // ── Búsqueda por descripción ──
+  function cacheBuscarDesc(texto) {
+    const t = texto.trim().toUpperCase();
+    const res = [];
+    for (const it of Cache.items) {
+      if ((it.desc || '').toUpperCase().includes(t)) {
+        res.push({ sku: it.sku, desc: it.desc });
+        if (res.length >= 8) break;
+      }
+    }
+    return res;
+  }
+
+  // ── Búsqueda por código madre ──
+  function cacheBuscarMadre(codigo) {
+    const cod = codigo.trim().toUpperCase();
+    const res = [];
+    for (const it of Cache.items) {
+      if ((it.cod || '').toUpperCase() === cod) {
+        res.push({ sku: it.sku, desc: it.desc, cod: it.cod });
+        if (res.length >= 50) break;
+      }
+    }
+    return res;
+  }
+
+  // ═══════════════════════════════════════════════
+  //  JSONP
+  // ═══════════════════════════════════════════════
+  function jsonp(url, callback) {
+    const fn = '_cb' + Date.now() + Math.random().toString(36).slice(2);
+    const old = document.getElementById('_jsonp_tag');
+    if (old) old.remove();
+    window[fn] = data => {
+      try { delete window[fn]; } catch(e) {}
+      document.getElementById('_jsonp_tag')?.remove();
+      callback(data);
+    };
+    const s = document.createElement('script');
+    s.id  = '_jsonp_tag';
+    s.src = url + (url.includes('?') ? '&' : '?') + 'callback=' + fn;
+    s.onerror = () => {
+      try { delete window[fn]; } catch(e) {}
+      s.remove();
+      callback(null);
+    };
+    document.head.appendChild(s);
+  }
+
+  // ═══════════════════════════════════════════════
+  //  DOM
+  // ═══════════════════════════════════════════════
+  const inputEl     = document.getElementById('skuInput');
+  const suggestEl   = document.getElementById('suggestions');
+  const resultadoEl = document.getElementById('resultado');
+  const vacioEl     = document.getElementById('estadoVacio');
+
+  let sugerenciaActiva = -1;
+  let timeoutSugg;
+
+  // ═══════════════════════════════════════════════
+  //  DROPDOWN — CONTROL CIERRE/APERTURA
+  //  Truco: en móvil, touchstart en el dropdown
+  //  evita que el blur del input lo cierre antes
+  //  de procesar el toque.
+  // ═══════════════════════════════════════════════
+  let tocandoDropdown = false;
+
+  suggestEl.addEventListener('touchstart', () => { tocandoDropdown = true; }, { passive: true });
+  suggestEl.addEventListener('touchend',   () => { tocandoDropdown = false; }, { passive: true });
+  suggestEl.addEventListener('touchcancel',() => { tocandoDropdown = false; }, { passive: true });
+
+  inputEl.addEventListener('blur', () => {
+    // Pequeña espera para que el touchend del item se procese primero
+    setTimeout(() => {
+      if (!tocandoDropdown) cerrarSugerencias();
+    }, 200);
+  });
+
+  // Clic fuera en desktop
+  document.addEventListener('mousedown', e => {
+    if (!e.target.closest('.input-wrap')) cerrarSugerencias();
+  });
+
+  // ═══════════════════════════════════════════════
+  //  TECLADO
+  // ═══════════════════════════════════════════════
+  inputEl.addEventListener('keydown', e => {
+    const items = suggestEl.querySelectorAll('.suggestion-item');
+    if (e.key === 'ArrowDown') {
+      e.preventDefault();
+      sugerenciaActiva = Math.min(sugerenciaActiva + 1, items.length - 1);
+      items.forEach((el,i) => el.classList.toggle('active', i === sugerenciaActiva));
+      items[sugerenciaActiva]?.scrollIntoView({ block: 'nearest' });
+    } else if (e.key === 'ArrowUp') {
+      e.preventDefault();
+      sugerenciaActiva = Math.max(sugerenciaActiva - 1, -1);
+      items.forEach((el,i) => el.classList.toggle('active', i === sugerenciaActiva));
+      items[sugerenciaActiva]?.scrollIntoView({ block: 'nearest' });
+    } else if (e.key === 'Enter') {
+      const activo = items[sugerenciaActiva];
+      if (activo) { inputEl.value = activo.dataset.sku; cerrarSugerencias(); }
+      buscar();
+    } else if (e.key === 'Escape') {
+      cerrarSugerencias();
+    }
+  });
+
+  // ═══════════════════════════════════════════════
+  //  AUTOCOMPLETAR
+  //  Prioridad: caché local (0 ms) → backend (300 ms delay)
+  // ═══════════════════════════════════════════════
+  inputEl.addEventListener('input', function() {
+    clearTimeout(timeoutSugg);
+    const val = this.value.trim();
+    if (val.length < 2) { cerrarSugerencias(); return; }
+
+    // ── Ruta rápida: caché local disponible ──
+    if (Cache.listo) {
+      const esNum = /^\d+$/.test(val);
+      if (esNum && val.length >= 5) {
+        // Intentar primero como código madre
+        const porMadre = cacheBuscarMadre(val);
+        if (porMadre.length > 0) {
+          mostrarSugerenciasDesc(porMadre, true); return;
+        }
+      }
+      if (esNum) {
+        const porSku = cacheSugerirSku(val);
+        porSku.length ? mostrarSugerenciasSimple(porSku) : cerrarSugerencias();
+      } else {
+        const porDesc = cacheBuscarDesc(val);
+        porDesc.length ? mostrarSugerenciasDesc(porDesc, false) : cerrarSugerencias();
+      }
+      return; // nunca va al backend para sugerencias
+    }
+
+    // ── Ruta lenta: caché aún no listo, usa backend ──
+    timeoutSugg = setTimeout(() => {
+      const esNum = /^\d+$/.test(val);
+      if (esNum && val.length >= 5) {
+        jsonp(API + '?action=codigoMadre&codigo=' + encodeURIComponent(val), lista => {
+          if (lista && lista.length > 0) { mostrarSugerenciasDesc(lista, true); return; }
+          jsonp(API + '?action=sugerir&prefijo=' + encodeURIComponent(val),
+            skus => skus ? mostrarSugerenciasSimple(skus.map(s => ({sku:s,desc:''}))) : cerrarSugerencias()
+          );
+        });
+      } else if (esNum) {
+        jsonp(API + '?action=sugerir&prefijo=' + encodeURIComponent(val),
+          lista => lista ? mostrarSugerenciasSimple(lista.map(s => ({sku:s,desc:''}))) : cerrarSugerencias()
+        );
+      } else {
+        jsonp(API + '?action=descripcion&texto=' + encodeURIComponent(val),
+          lista => lista ? mostrarSugerenciasDesc(lista, false) : cerrarSugerencias()
+        );
+      }
+    }, 300);
+  });
+
+  // ═══════════════════════════════════════════════
+  //  RENDER SUGERENCIAS
+  // ═══════════════════════════════════════════════
+  function mostrarSugerenciasSimple(lista) {
+    if (!lista || !lista.length) { cerrarSugerencias(); return; }
+    sugerenciaActiva = -1;
+    suggestEl.innerHTML = lista.map(s =>
+      `<div class="suggestion-item" data-sku="${esc(s.sku)}">
+         <span class="sugg-desc">${esc(s.sku)}</span>
+         ${s.desc ? `<span class="sugg-label">${esc(s.desc)}</span>` : ''}
+       </div>`
+    ).join('');
+    _bindItemsToque();
+    suggestEl.classList.remove('hidden');
+  }
+
+  function mostrarSugerenciasDesc(lista, esMadre) {
+    if (!lista || !lista.length) { cerrarSugerencias(); return; }
+    sugerenciaActiva = -1;
+    const header = esMadre
+      ? `<div class="sugg-header-sticky">📦 ${lista.length} variante${lista.length > 1 ? 's' : ''} encontrada${lista.length > 1 ? 's' : ''}</div>`
+      : '';
+    suggestEl.innerHTML = header + lista.map(s =>
+      `<div class="suggestion-item" data-sku="${esc(s.sku)}">
+         <span class="sugg-label">${esc(s.sku)}</span>
+         <span class="sugg-desc">${esc(s.desc)}</span>
+       </div>`
+    ).join('');
+    _bindItemsToque();
+    suggestEl.classList.remove('hidden');
+  }
+
+  // Vincula toque en cada ítem de forma que no interfiera con el scroll
+  function _bindItemsToque() {
+    let startY = 0;
+    let scrolling = false;
+
+    suggestEl.addEventListener('touchstart', e => {
+      startY = e.touches[0].clientY;
+      scrolling = false;
+    }, { passive: true, once: false });
+
+    suggestEl.addEventListener('touchmove', e => {
+      if (Math.abs(e.touches[0].clientY - startY) > 5) scrolling = true;
+    }, { passive: true });
+
+    suggestEl.querySelectorAll('.suggestion-item').forEach(item => {
+      // mousedown para desktop
+      item.addEventListener('mousedown', e => {
+        e.preventDefault();
+        elegirSugerencia(item.dataset.sku);
+      });
+      // touchend para móvil — solo si no fue scroll
+      item.addEventListener('touchend', e => {
+        if (!scrolling) {
+          e.preventDefault();
+          elegirSugerencia(item.dataset.sku);
+        }
+      }, { passive: false });
+    });
+  }
+
+  function elegirSugerencia(sku) {
+    inputEl.value = sku;
+    cerrarSugerencias();
+    buscar();
+  }
+
+  function cerrarSugerencias() {
+    suggestEl.classList.add('hidden');
+    suggestEl.innerHTML = '';
+    sugerenciaActiva = -1;
+  }
+
+  // ═══════════════════════════════════════════════
+  //  BUSCAR — siempre al backend (stock en tiempo real)
+  // ═══════════════════════════════════════════════
+  function buscar() {
+    const sku = inputEl.value.trim();
+    if (!sku) { inputEl.focus(); return; }
+    cerrarSugerencias();
+    mostrarLoading();
+    jsonp(API + '?action=buscar&sku=' + encodeURIComponent(sku), data => {
+      if (data) mostrarResultado(data);
+      else mostrarError({ message: 'Sin respuesta del servidor.' });
+    });
+  }
+
+  function mostrarLoading() {
+    vacioEl.style.display = 'none';
+    resultadoEl.classList.remove('hidden');
+    resultadoEl.innerHTML = `<div class="loading"><div class="spinner"></div><p>Consultando bodega…</p></div>`;
+  }
+
+  function mostrarResultado(data) {
+    if (data.success) {
+      const stock = data.stock;
+      const badge = stock === 0
+        ? `<span class="stock-badge badge-zero">Sin stock</span>`
+        : stock <= 5
+        ? `<span class="stock-badge badge-low">Stock bajo</span>`
+        : `<span class="stock-badge badge-ok">Disponible</span>`;
+
+      resultadoEl.innerHTML = `
+        <div class="res-header">
+          <div class="res-icon">📦</div>
+          <div>
+            <div class="res-found-label">Producto encontrado</div>
+            <div class="res-sku">${esc(data.sku)}</div>
+          </div>
+        </div>
+        <div class="res-body">
+          <div class="res-grid">
+            <div class="res-field desc-field span2">
+              <div class="res-field-label">Descripción</div>
+              <div class="res-field-value">${esc(data.desc) || '<em style="color:#9ca3af">Sin descripción</em>'}</div>
+            </div>
+            <div class="res-field">
+              <div class="res-field-label">Stock en Bodega</div>
+              <div class="stock-num">${stock.toLocaleString('es-CL')}</div>
+              <div class="stock-unit">unidades</div>
+              ${badge}
+            </div>
+            <div class="res-field">
+              <div class="res-field-label">SKU</div>
+              <div class="res-field-value" style="font-family:monospace;font-size:15px;word-break:break-all">${esc(String(data.sku))}</div>
+            </div>
+          </div>
+        </div>`;
+    } else {
+      resultadoEl.innerHTML = `
+        <div class="res-error">
+          <div class="error-icon">🔎</div>
+          <div>
+            <div class="error-title">No encontrado</div>
+            <div class="error-msg">${esc(data.error)}</div>
+          </div>
+        </div>`;
+    }
+    resultadoEl.classList.remove('hidden');
+  }
+
+  function mostrarError(err) {
+    resultadoEl.innerHTML = `
+      <div class="res-error">
+        <div class="error-icon">⚠️</div>
+        <div>
+          <div class="error-title">Error de conexión</div>
+          <div class="error-msg">${esc(err.message || 'No se pudo conectar.')}</div>
+        </div>
+      </div>`;
+  }
+
+  // ═══════════════════════════════════════════════
+  //  SCANNER
+  // ═══════════════════════════════════════════════
+  let scanner      = null;
+  let escaneado    = false;
+  let camaraActual = null;
+
+  async function abrirScanner() {
+    escaneado = false;
+    document.getElementById('scannerOverlay').classList.remove('hidden');
+    _resetUIScanner();
+    await _iniciarCamara();
+  }
+
+  function _resetUIScanner() {
+    const bar = document.getElementById('scannerStatus');
+    bar.className = 'scanner-status';
+    bar.innerHTML = `<span>🔍</span><span class="scan-status-text" id="scannerStatusText">Iniciando cámara…</span>`;
+    document.getElementById('scannerManualInput').value = '';
+  }
+
+  async function _iniciarCamara() {
+    if (scanner) {
+      try { await scanner.stop(); } catch(e) {}
+      scanner = null;
+    }
+    document.getElementById('reader').innerHTML = '';
+    escaneado = false;
+
+    const config = {
+      fps: 15,
+      qrbox: { width: 280, height: 110 },
+      formatsToSupport: [
+        Html5QrcodeSupportedFormats.EAN_13, Html5QrcodeSupportedFormats.EAN_8,
+        Html5QrcodeSupportedFormats.CODE_128, Html5QrcodeSupportedFormats.CODE_39,
+        Html5QrcodeSupportedFormats.UPC_A,  Html5QrcodeSupportedFormats.UPC_E,
+      ]
+    };
+
+    scanner = new Html5Qrcode('reader');
+    try {
+      const camaras = await Html5Qrcode.getCameras();
+      if (camaras.length > 1) {
+        const trasera = camaras.find(c => /back|rear|trasera|environment/i.test(c.label));
+        camaraActual = trasera ? trasera.id : camaras[camaras.length - 1].id;
+
+        if (!document.querySelector('.scanner-viewport select')) {
+          const sel = document.createElement('select');
+          sel.style.cssText = 'position:absolute;top:8px;left:50%;transform:translateX(-50%);z-index:10;background:#0f172a;color:#93c5fd;border:1px solid #2563eb;border-radius:8px;padding:6px 10px;font-size:13px;max-width:85%';
+          camaras.forEach(c => {
+            const opt = document.createElement('option');
+            opt.value = c.id; opt.textContent = c.label || `Cámara ${c.id}`;
+            if (c.id === camaraActual) opt.selected = true;
+            sel.appendChild(opt);
+          });
+          sel.addEventListener('change', async () => { camaraActual = sel.value; await _iniciarCamara(); });
+          document.querySelector('.scanner-viewport').appendChild(sel);
+        }
+      } else {
+        camaraActual = camaras[0]?.id || { facingMode: 'environment' };
+      }
+
+      await scanner.start(camaraActual, config,
+        decoded => { if (!escaneado) exitoScanner(decoded); },
+        () => {}
+      );
+      const st = document.getElementById('scannerStatusText');
+      if (st) st.textContent = 'Buscando código de barras…';
+    } catch(err) {
+      const bar = document.getElementById('scannerStatus');
+      bar.innerHTML = `<span>⚠️</span><span class="scan-status-text"><strong style="color:#fca5a5">Sin acceso a cámara</strong>Usa el campo de abajo</span>`;
+    }
+  }
+
+  function exitoScanner(codigo) {
+    escaneado = true;
+    if (navigator.vibrate) navigator.vibrate([100, 50, 100]);
+    const bar = document.getElementById('scannerStatus');
+    bar.className = 'scanner-status success';
+    bar.innerHTML = `<span>✅</span><span class="scan-status-text"><strong>${esc(codigo)}</strong>¡Escaneado!</span>`;
+    setTimeout(async () => {
+      await _detenerCamara();
+      document.getElementById('scannerOverlay').classList.add('hidden');
+      inputEl.value = codigo;
+      buscar();
+    }, 900);
+  }
+
+  async function _detenerCamara() {
+    if (scanner) { try { await scanner.stop(); } catch(e) {} scanner = null; }
+    document.getElementById('reader').innerHTML = '';
+  }
+
+  async function cerrarScanner() {
+    await _detenerCamara();
+    document.querySelector('.scanner-viewport select')?.remove();
+    document.getElementById('scannerOverlay').classList.add('hidden');
+    document.getElementById('scannerManualInput').value = '';
+    escaneado = false;
+  }
+
+  function confirmarManualScanner() {
+    const val = document.getElementById('scannerManualInput').value.trim();
+    if (val) exitoScanner(val);
+  }
+  document.getElementById('scannerManualInput').addEventListener('keydown', e => {
+    if (e.key === 'Enter') confirmarManualScanner();
+  });
+
+  // ═══════════════════════════════════════════════
+  //  UTIL
+  // ═══════════════════════════════════════════════
+  function esc(s) {
+    return String(s ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  }
+
+  // ── Arranque: carga caché silenciosa en background ──
+  cargarCache();
+  </script>
+</body>
+</html>
