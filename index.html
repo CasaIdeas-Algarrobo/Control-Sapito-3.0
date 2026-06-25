@@ -1021,7 +1021,7 @@ async function onScanExitoso(codigo) {
   btnCambiarCam.classList.add('hidden');
   setTimeout(async () => {
     await cerrarScanner();
-    input.value = codigo;
+    inputEl.value = codigo;
     buscar();
   }, 900);
 }
